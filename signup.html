@@ -233,7 +233,7 @@
     function syncNavbarState() {
       const navContainer = document.getElementById("navbar-controls");
       if (!navContainer) return;
-      const loggedUser = JSON.parse(localStorage.getItem("active_user"));
+      const loggedUser = window.currentUser;
  
       if (loggedUser) {
         // SECURITY: escapeHtml on loggedUser.name
@@ -252,8 +252,7 @@
     }
  
     function logoutUser() {
-      localStorage.removeItem("active_user");
-      window.location.reload();
+      fetch('/api/logout', { method: 'POST' }).finally(() => window.location.reload());
     }
  
     document.getElementById('signup-form').addEventListener('submit', function(e) {
@@ -290,7 +289,13 @@
       });
     });
  
-    document.addEventListener("DOMContentLoaded", syncNavbarState);
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const state = await fetch('/api/session').then(response => response.json());
+        window.currentUser = state.authenticated ? state.user : null;
+      } catch { window.currentUser = null; }
+      syncNavbarState();
+    });
   </script>
 </body>
 </html>

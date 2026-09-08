@@ -1,5 +1,7 @@
 # Secrets
 .env
+.env.*
+!.env.example
 
 # SSL private/local certificates
 server.key
@@ -8,6 +10,22 @@ server.crt
 # Node
 node_modules/
 npm-debug.log*
+yarn-error.log*
+.npm/
+
+# Local data, database exports, and packaged source copies
+users.json
+*.sql
+*.sqlite*
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# Editors and test output
+.idea/
+.vscode/
+coverage/
 
 # macOS
 .DS_Store

@@ -419,14 +419,11 @@
     }
  
     // ─── PLACE ORDER API ──────────────────────────────────
-    function placeOrder(totalPrice) {
-      const loggedUser = JSON.parse(localStorage.getItem("active_user"));
-      const userId = loggedUser?.id || null;
- 
+    function placeOrder(paymentIntentId) {
       return fetch('/api/place-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, totalPrice: parseFloat(totalPrice.toFixed(2)) })
+        body: JSON.stringify({ paymentIntentId, items: cart.map(item => item.name), zipCode: document.getElementById('cust-zip').value })
       })
       .then(res => res.json())
       .then(data => {
@@ -435,16 +432,22 @@
       });
     }
  
+    async function logoutUser() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.currentUser = null;
+      renderNavbarState();
+    }
+
     // ─── NAVBAR ──────────────────────────────────────────
     function renderNavbarState() {
       const nav = document.getElementById("navbar-controls");
       if (!nav) return;
-      const u = JSON.parse(localStorage.getItem("active_user"));
+      const u = window.currentUser;
       // SECURITY: escapeHtml on u.name prevents XSS if name contains HTML
       nav.innerHTML = u
         ? `<span class="user-greeting">Hi, ${escapeHtml(u.name)}</span>
            <a href="index.html" class="login nav-active-page">Checkout</a>
-           <a href="#" class="login" onclick="localStorage.removeItem('active_user');location.reload();return false;">Log-out</a>`
+           <a href="#" class="login" onclick="logoutUser();return false;">Log-out</a>`
         : `<a href="index.html" class="login nav-active-page">Checkout</a>
            <a href="login.html" class="login">Log-in</a>
            <a href="signup.html" class="signup">Sign-up</a>`;
@@ -663,7 +666,7 @@
         fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ totalPrice: total })
+          body: JSON.stringify({ items: cart.map(item => item.name), zipCode: document.getElementById('cust-zip').value })
         })
         .then(r => r.json())
         .then(async data => {
@@ -680,7 +683,7 @@
             payBtn.innerHTML = `Pay $${total.toFixed(2)}`;
             showError(result.error.message);
           } else {
-            return placeOrder(total).then(orderId => {
+            return placeOrder(result.paymentIntent.id).then(orderId => {
               clearFormDraft();
               showOrderConfirmation(orderId);
             });
@@ -759,7 +762,11 @@
     }
  
     // ─── INIT ─────────────────────────────────────────────
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const state = await fetch('/api/session').then(response => response.json());
+        window.currentUser = state.authenticated ? state.user : null;
+      } catch { window.currentUser = null; }
       renderNavbarState();
       renderOrderSummary();
       restoreFormDraft();
