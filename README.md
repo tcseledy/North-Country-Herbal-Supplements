@@ -1,6 +1,6 @@
 # North Country Herbal Supplements
 
-North Country Herbal Supplements is a full-stack e-commerce web application built to demonstrate a secure online shopping and checkout experience. The project includes product browsing, cart and checkout functionality, user authentication, database integration, payment processing, and ZIP-code-based sales tax calculations.
+North Country Herbal Supplements is a full-stack e-commerce web application built to demonstrate a secure online shopping and checkout experience. The project includes product browsing, cart and checkout functionality, user authentication, database integration, payment processing, and ZIP-code-based sales tax calculations. Note that this is a demo and not for practical use.
 
 ## Features
 
@@ -51,7 +51,3 @@ This project was created as a hands-on demonstration of full-stack web developme
 ## Author
 
 Theo Cseledy
-
-## Disclaimer
-
-This repository is an educational/demo project. Product information and checkout functionality should not be interpreted as medical advice or as a production commercial service.
