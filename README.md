@@ -38,7 +38,7 @@ The repository contains the frontend and backend files for the store along with 
 4. Set up the MySQL database used by the application.
 5. Add the required Stripe credentials to your local environment configuration.
 6. Start the application using the project's server entry point.
-7. Open the local application address in your browser.
+7. Open the local application address in your browser. For this instance, https://localhost:8080/
 
 ## Security
 
