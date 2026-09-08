@@ -1,0 +1,16 @@
+# Secrets
+.env
+
+# SSL private/local certificates
+server.key
+server.crt
+
+# Node
+node_modules/
+npm-debug.log*
+
+# macOS
+.DS_Store
+
+# Logs
+*.log

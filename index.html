@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Secure Checkout - North Country's Herbal Supplements</title>
+ 
+  <!-- SECURITY: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com;
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+             font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+             img-src 'self' data:;
+             connect-src 'self' https://api.stripe.com;
+             frame-src https://js.stripe.com;
+             frame-ancestors 'none';">
+ 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+ 
+  <style>
+    #checkout-form-fields {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      border: 1px solid #eee;
+    }
+ 
+    .form-control {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+ 
+    .form-control:focus {
+      outline: none;
+      border-color: #6c63ff !important;
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+    }
+ 
+    .form-control[readonly] {
+      background-color: #f8f9fa !important;
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+ 
+    .form-control.is-invalid {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12) !important;
+    }
+    .form-control.is-valid {
+      border-color: #198754 !important;
+    }
+    .invalid-feedback {
+      display: none;
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .form-control.is-invalid ~ .invalid-feedback {
+      display: block;
+    }
+ 
+    .payment-box-wrapper {
+      background: #f8f8ff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e6ff;
+      margin-bottom: 15px;
+    }
+ 
+    .selector-card-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      background: white;
+      border: 1px solid #ddd;
+      padding: 0 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .selector-card-label i {
+      font-size: 1.1rem !important;
+      line-height: 1;
+    }
+    .selector-card-label:hover {
+      background: #fcfcfc;
+      border-color: #ccc;
+    }
+    .payment-selector-radio:checked + .selector-card-label {
+      border-color: #6c63ff;
+      background-color: #f4f3ff;
+      color: #6c63ff;
+    }
+ 
+    .btn-custom-outline {
+      background-color: transparent;
+      border: 1px solid #6c63ff;
+      color: #6c63ff;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .btn-custom-outline:hover {
+      background-color: #f4f3ff;
+      color: #6c63ff;
+      border-color: #6c63ff;
+    }
+ 
+    .pay-btn {
+      width: 100%;
+      padding: 15px;
+      background: #6c63ff !important;
+      color: white !important;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .pay-btn:hover { background: #5249d7 !important; }
+ 
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      border: 1px solid #eee;
+      box-sizing: border-box;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+ 
+    /* ORDER CONFIRMATION */
+    #order-confirmation {
+      display: none;
+      max-width: 560px;
+      margin: 40px auto;
+      background: #fff;
+      border: 1px solid #e8e8f0;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(108,99,255,0.08);
+      text-align: center;
+    }
+    #order-confirmation .confirm-icon {
+      width: 64px; height: 64px;
+      background: #f0fdf4;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+      color: #16a34a;
+    }
+    #order-confirmation .confirm-items {
+      background: #f8f8ff;
+      border: 1px solid #e6e6ff;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    #order-confirmation .confirm-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 5px 0;
+    }
+    #order-confirmation .confirm-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: 700;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+ 
+  <nav class="site-nav">
+    <div class="storefront-container d-flex justify-content-between align-items-center w-100 py-0 px-0">
+      <a href="home.html" class="logo-link mb-0 text-decoration-none">North Country's Herbal Supplements</a>
+      <div id="navbar-controls" class="d-flex align-items-center gap-2"></div>
+    </div>
+  </nav>
+ 
+  <main class="container my-4 flex-grow-1">
+ 
+    <!-- ORDER CONFIRMATION -->
+    <div id="order-confirmation">
+      <div class="confirm-icon"><i class="fa-solid fa-circle-check"></i></div>
+      <h2 class="h4 fw-bold mb-1" style="color:#1a1a2e;">Order Confirmed!</h2>
+      <p class="text-muted small mb-0">Thank you for your purchase from <strong>North Country's Herbal Supplements</strong>. A confirmation has been sent to your email.</p>
+      <div class="confirm-items">
+        <div id="confirm-items-list"></div>
+        <div class="confirm-row text-muted mt-2"><span>Subtotal</span><span id="confirm-subtotal" class="text-dark fw-semibold"></span></div>
+        <div class="confirm-row text-muted"><span>Shipping</span><span class="text-success fw-semibold">Free</span></div>
+        <div class="confirm-row text-muted"><span>Tax</span><span id="confirm-tax" class="text-dark fw-semibold"></span></div>
+        <div class="confirm-total"><span>Total Charged</span><span id="confirm-total" style="color:#6c63ff;"></span></div>
+      </div>
+      <p id="confirm-order-id" class="text-muted small mt-2"></p>
+      <a href="home.html" class="btn w-100 py-2 mt-2" style="background:#6c63ff; color:#fff; border-radius:10px; font-weight:600;">
+        Continue Shopping
+      </a>
+    </div>
+ 
+    <!-- CHECKOUT LAYOUT -->
+    <div id="checkout-layout" class="row g-4">
+      <div class="col-lg-7">
+        <form id="checkout-form-fields" onsubmit="handleFormSubmit(event)" novalidate>
+          <h1 class="h2 fw-bold tracking-tight mb-1">Secure Checkout</h1>
+          <p class="text-muted small mb-4">Demo Mode</p>
+ 
+          <div id="err-banner" role="alert"></div>
+          <div id="geo-status" class="alert mb-4" style="display: none;" role="alert"></div>
+ 
+          <h3 class="h6 text-uppercase fw-bold text-dark border-bottom pb-2 mb-3" style="letter-spacing: 0.5px;">Contact Information</h3>
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <label for="cust-name" class="form-label mb-1">Full Name</label>
+              <input type="text" class="form-control" id="cust-name" placeholder="John Doe" required autocomplete="name" maxlength="120"/>
+              <div class="invalid-feedback">Please enter your full name.</div>
+            </div>
+            <div class="col-12">
+              <label for="cust-email" class="form-label mb-1">Email Address</label>
+              <input type="email" class="form-control" id="cust-email" placeholder="johndoe@example.com" required autocomplete="email" maxlength="254"/>
+              <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            <div class="col-md-8">
+              <label for="cust-street" class="form-label mb-1">Street Address</label>
+              <input type="text" class="form-control" id="cust-street" placeholder="123 Main St" required autocomplete="street-address" maxlength="200"/>
+              <div class="invalid-feedback">Please enter your street address.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="cust-zip" class="form-label mb-1">ZIP Code</label>
+              <input type="text" class="form-control" id="cust-zip" placeholder="12345" required pattern="[0-9]{5}(-[0-9]{4})?" autocomplete="postal-code" maxlength="10" inputmode="numeric"/>
+              <div class="invalid-feedback">Enter a valid 5-digit ZIP.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="cust-city" class="form-label mb-1">City</label>
+              <input type="text" class="form-control" id="cust-city" placeholder="" required autocomplete="address-level2" maxlength="100"/>
+              <div class="invalid-feedback">Please enter your city.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="cust-state" class="form-label mb-1">State</label>
+              <input type="text" class="form-control" id="cust-state" readonly required placeholder="Auto-populated via ZIP" autocomplete="address-level1" maxlength="50"/>
+              <div class="invalid-feedback">Verify your ZIP to populate state.</div>
+            </div>
+            <div class="col-12">
+              <button type="button" class="btn btn-custom-outline w-100 py-2 mt-1" onclick="checkTax()">
+                <i class="fa-solid fa-map-location-dot me-2"></i> Verify Address & Apply Tax
+              </button>
+            </div>
+          </div>
+ 
+          <h3 class="h6 text-uppercase fw-bold text-dark border-bottom pb-2 mb-3" style="letter-spacing: 0.5px;">Payment Method</h3>
+          <div id="payment-info-warning" class="alert alert-warning d-flex align-items-center gap-2 mb-3" style="display:none !important;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Please fill in your <strong>name</strong> and <strong>email</strong> before selecting a payment method.</span>
+          </div>
+          <div class="payment-box-wrapper shadow-sm mb-4">
+            <div class="row g-2 mb-3">
+              <div class="col-6 col-md-3">
+                <input type="radio" id="pay-card" name="pay" class="payment-selector-radio d-none" value="card" checked/>
+                <label for="pay-card" class="selector-card-label"><i class="fa-solid fa-credit-card"></i> Card</label>
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="radio" id="pay-paypal" name="pay" class="payment-selector-radio d-none" value="paypal"/>
+                <label for="pay-paypal" class="selector-card-label"><i class="fa-brands fa-paypal" style="color:#003087;"></i> PayPal</label>
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="radio" id="pay-gpay" name="pay" class="payment-selector-radio d-none" value="gpay"/>
+                <label for="pay-gpay" class="selector-card-label"><i class="fa-brands fa-google-pay" style="color:#1a1a1a;"></i></label>
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="radio" id="pay-venmo" name="pay" class="payment-selector-radio d-none" value="venmo"/>
+                <label for="pay-venmo" class="selector-card-label"><i class="fa-brands fa-venmo" style="color:#008CFF;"></i> Venmo</label>
+              </div>
+            </div>
+ 
+            <div id="credit-card-fields-wrapper" class="row g-2">
+              <div class="col-12">
+                <input type="text" id="card-name" class="form-control" placeholder="Name on Card" autocomplete="cc-name" maxlength="120"/>
+                <div class="invalid-feedback">Enter the name on your card.</div>
+              </div>
+              <div class="col-12">
+                <div id="stripe-card-element" style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;"></div>
+                <div id="stripe-card-errors" class="invalid-feedback" style="display:none;"></div>
+              </div>
+            </div>
+ 
+            <div id="external-payment-note" style="display:none;" class="text-center text-muted small py-2">
+              <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>
+              You'll be redirected to complete payment securely.
+            </div>
+          </div>
+ 
+          <button type="submit" class="btn pay-btn">
+            <i class="fa-solid fa-lock me-2"></i> Pay $0.00
+          </button>
+          <p class="text-center text-muted small mt-3">Demo Mode
+        </form>
+      </div>
+ 
+      <div class="col-lg-5">
+        <div class="card p-4 bg-white shadow-sm sticky-top" style="top: 20px; z-index: 10;">
+          <h2 class="h5 border-bottom pb-3 mb-3 fw-bold">Order Summary (<span id="cart-count">0</span> items)</h2>
+          <div id="cart-items-container" class="mb-3"></div>
+          <hr class="text-muted opacity-25 my-3"/>
+          <div class="d-flex justify-content-between small mb-2">
+            <span class="text-muted">Subtotal:</span>
+            <span id="summary-subtotal" class="fw-semibold text-dark">$0.00</span>
+          </div>
+          <div class="d-flex justify-content-between small mb-2">
+            <span class="text-muted">Shipping:</span>
+            <span id="summary-shipping" class="text-success fw-bold">Free</span>
+          </div>
+          <div class="d-flex justify-content-between small mb-3">
+            <span class="text-muted">Tax:</span>
+            <span id="summary-tax" class="fw-semibold text-dark">$0.00</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center border-top pt-3 mb-4">
+            <h3 class="h5 mb-0 fw-bold">Total Due:</h3>
+            <span id="summary-total" class="h3 mb-0 fw-bold text-dark">$0.00</span>
+          </div>
+          <div class="bg-light p-3 rounded-3 border">
+            <div class="d-flex flex-column gap-2 small text-muted">
+              <div><i class="fa-solid fa-circle-check text-success me-2"></i>Free standard shipping worldwide</div>
+              <div><i class="fa-solid fa-circle-check text-success me-2"></i>30-day refund policy</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+ 
+  <footer class="text-center py-4 mt-auto">
+    <div class="container justify-content-center text-white">
+      © 2026 Theo Cseledy - North Country's Herbal Supplements
+    </div>
+  </footer>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+ 
+  <script>
+    // ─── STRIPE SETUP ─────────────────────────────────────
+    let stripe = null;
+    let elements = null;
+    let cardElement = null;
+
+    fetch('/api/stripe-config')
+      .then(r => r.json())
+      .then(cfg => {
+        stripe = Stripe(cfg.publishableKey);
+        elements = stripe.elements();
+        cardElement = elements.create('card', {
+          style: {
+            base: { fontSize: '14px', color: '#333', '::placeholder': { color: '#aaa' } },
+            invalid: { color: '#dc3545' }
+          }
+        });
+        cardElement.mount('#stripe-card-element');
+        cardElement.on('change', e => {
+          const errEl = document.getElementById('stripe-card-errors');
+          if (e.error) { errEl.textContent = e.error.message; errEl.style.display = 'block'; }
+          else { errEl.style.display = 'none'; }
+        });
+      });
+
+    // SECURITY: Escape all user-controlled strings before inserting into innerHTML
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+    }
+ 
+    let cart = [];
+    let currentTaxRate = 0.00;
+    let _allowLeave = false;
+ 
+    try { cart = JSON.parse(localStorage.getItem("user_cart")) || []; } catch(e) {}
+ 
+    // SECURITY: Sanitize cart items loaded from localStorage
+    cart = cart.filter(item =>
+      item && typeof item.name === 'string' && item.name.trim() &&
+      typeof item.price === 'number' && item.price > 0 && item.price < 10000
+    );
+ 
+    // ─── ERROR BANNER ─────────────────────────────────────
+    function showError(msg) {
+      const el = document.getElementById('err-banner');
+      el.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-2"></i>${escapeHtml(msg)}`;
+      el.setAttribute('style',
+        'display:block!important;background:#fff5f5;border:1.5px solid #f5c2c7;' +
+        'border-radius:8px;padding:12px 16px;font-size:13px;color:#842029;margin-bottom:16px;'
+      );
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function hideError() {
+      document.getElementById('err-banner').setAttribute('style', 'display:none!important');
+    }
+ 
+    // ─── PLACE ORDER API ──────────────────────────────────
+    function placeOrder(totalPrice) {
+      const loggedUser = JSON.parse(localStorage.getItem("active_user"));
+      const userId = loggedUser?.id || null;
+ 
+      return fetch('/api/place-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, totalPrice: parseFloat(totalPrice.toFixed(2)) })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) throw new Error(data.error || 'Order failed');
+        return data.orderId;
+      });
+    }
+ 
+    // ─── NAVBAR ──────────────────────────────────────────
+    function renderNavbarState() {
+      const nav = document.getElementById("navbar-controls");
+      if (!nav) return;
+      const u = JSON.parse(localStorage.getItem("active_user"));
+      // SECURITY: escapeHtml on u.name prevents XSS if name contains HTML
+      nav.innerHTML = u
+        ? `<span class="user-greeting">Hi, ${escapeHtml(u.name)}</span>
+           <a href="index.html" class="login nav-active-page">Checkout</a>
+           <a href="#" class="login" onclick="localStorage.removeItem('active_user');location.reload();return false;">Log-out</a>`
+        : `<a href="index.html" class="login nav-active-page">Checkout</a>
+           <a href="login.html" class="login">Log-in</a>
+           <a href="signup.html" class="signup">Sign-up</a>`;
+    }
+ 
+    // ─── TAX LOOKUP + ADDRESS VALIDATION ─────────────────
+    async function checkTax() {
+      const zip    = document.getElementById('cust-zip').value.trim();
+      const street = document.getElementById('cust-street').value.trim();
+      const statusBanner = document.getElementById("geo-status");
+      const zipField    = document.getElementById('cust-zip');
+      const streetField = document.getElementById('cust-street');
+
+      if (!street) {
+        streetField.classList.add('is-invalid');
+        return;
+      }
+      streetField.classList.remove('is-invalid');
+
+      if (!zip || !/^\d{5}(-\d{4})?$/.test(zip)) {
+        zipField.classList.add('is-invalid');
+        return;
+      }
+      zipField.classList.remove('is-invalid');
+
+      statusBanner.className = "alert alert-info d-block mb-4";
+      statusBanner.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Validating address...`;
+      statusBanner.style.display = '';
+
+      try {
+        // Step 1: Validate address via US Census Geocoder
+        const addrRes = await fetch('/api/validate-address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ street, zip })
+        });
+        const addrData = await addrRes.json();
+
+        if (!addrData.success) {
+          statusBanner.className = "alert alert-danger d-block mb-4";
+          statusBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-2"></i> ${escapeHtml(addrData.error)}`;
+          streetField.classList.add('is-invalid');
+          return;
+        }
+
+        streetField.classList.remove('is-invalid');
+        document.getElementById('cust-city').removeAttribute('readonly');
+        document.getElementById('cust-state').removeAttribute('readonly');
+        if (addrData.city)  document.getElementById('cust-city').value  = addrData.city;
+        if (addrData.state) document.getElementById('cust-state').value = addrData.state;
+        if (addrData.zip)   document.getElementById('cust-zip').value   = addrData.zip;
+
+        // Step 2: Tax lookup using verified ZIP
+        const taxRes = await fetch('/api/calculate-tax', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: addrData.zip, zipCode: addrData.zip })
+        });
+        const taxData = await taxRes.json();
+
+        if (taxData.success) {
+          currentTaxRate = taxData.taxDetails.combinedRate;
+          statusBanner.className = "alert alert-success d-block mb-4";
+          statusBanner.innerHTML = `<i class="fa-solid fa-circle-check me-2"></i> Address verified: <strong>${escapeHtml(addrData.matchedAddress)}</strong> — ${(currentTaxRate * 100).toFixed(2)}% tax applied.`;
+        } else {
+          currentTaxRate = 0;
+          statusBanner.className = "alert alert-success d-block mb-4";
+          statusBanner.innerHTML = `<i class="fa-solid fa-circle-check me-2"></i> Address verified: <strong>${escapeHtml(addrData.matchedAddress)}</strong> — No tax data for this ZIP.`;
+        }
+        renderOrderSummary();
+      } catch (err) {
+        statusBanner.className = "alert alert-warning d-block mb-4";
+        statusBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-2"></i> Validation service offline — please verify your address manually.`;
+        currentTaxRate = 0;
+        document.getElementById('cust-city').removeAttribute('readonly');
+        document.getElementById('cust-state').removeAttribute('readonly');
+        renderOrderSummary();
+      }
+    }
+ 
+    // ─── ORDER SUMMARY ────────────────────────────────────
+    function renderOrderSummary() {
+      const container = document.getElementById("cart-items-container");
+      if (!container) return;
+      container.innerHTML = "";
+      let subtotal = 0;
+ 
+      if (!cart.length) {
+        container.innerHTML = `<div class="text-muted fst-italic py-2 small">Your cart is empty.</div>`;
+      } else {
+        cart.forEach((item, index) => {
+          subtotal += item.price;
+          const el = document.createElement("div");
+          el.className = "d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-light text-secondary small";
+          // SECURITY: escapeHtml on item.name (came from localStorage, user-controlled)
+          el.innerHTML = `
+            <div>
+              <div class="fw-bold text-dark">${escapeHtml(item.name)}</div>
+              <button type="button" onclick="removeFromCart(${index})" class="btn btn-link btn-sm p-0 text-danger text-decoration-none" style="font-size:11px;">✕ Remove</button>
+            </div>
+            <span class="fw-semibold text-dark">$${item.price.toFixed(2)}</span>`;
+          container.appendChild(el);
+        });
+      }
+ 
+      const taxCost = subtotal * currentTaxRate;
+      const grandTotal = subtotal + taxCost;
+      document.getElementById('cart-count').textContent = cart.length;
+      document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('summary-tax').textContent = `$${taxCost.toFixed(2)} (${(currentTaxRate * 100).toFixed(2)}%)`;
+      document.getElementById('summary-total').textContent = `$${grandTotal.toFixed(2)}`;
+      const payBtn = document.querySelector(".pay-btn");
+      if (payBtn) payBtn.innerHTML = `<i class="fa-solid fa-lock me-2"></i> Pay $${grandTotal.toFixed(2)}`;
+    }
+ 
+    function removeFromCart(i) {
+      cart.splice(i, 1);
+      localStorage.setItem("user_cart", JSON.stringify(cart));
+      renderOrderSummary();
+    }
+ 
+    // ─── VALIDATION ───────────────────────────────────────
+    function validateField(el) {
+      const empty = !el.value.trim();
+      const badEmail = el.type === 'email' && !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+      const invalid = empty || badEmail;
+      el.classList.toggle('is-invalid', invalid);
+      el.classList.toggle('is-valid', !invalid);
+      const fb = el.nextElementSibling;
+      if (fb && fb.classList.contains('invalid-feedback')) {
+        fb.style.display = invalid ? 'block' : 'none';
+      }
+      return !invalid;
+    }
+ 
+    function validateContactFields(fullAddress = true) {
+      const fields = fullAddress
+        ? ['cust-name', 'cust-email', 'cust-street', 'cust-zip', 'cust-city', 'cust-state']
+        : ['cust-name', 'cust-email'];
+      let ok = true;
+      fields.forEach(id => { if (!validateField(document.getElementById(id))) ok = false; });
+      return ok;
+    }
+ 
+    function luhnCheck(num) {
+      const digits = num.replace(/\s/g, '').split('').reverse();
+      let sum = 0;
+      digits.forEach((d, i) => {
+        let n = parseInt(d);
+        if (i % 2 === 1) { n *= 2; if (n > 9) n -= 9; }
+        sum += n;
+      });
+      return sum % 10 === 0;
+    }
+
+    function validateCardFields() {
+      let ok = true;
+      ['card-cvc', 'card-name'].forEach(id => {
+        if (!validateField(document.getElementById(id))) ok = false;
+      });
+
+      const cardNumEl = document.getElementById('card-num');
+      const rawNum = cardNumEl.value.replace(/\s/g, '');
+      const validNum = /^\d{12,19}$/.test(rawNum) && luhnCheck(rawNum);
+      cardNumEl.classList.toggle('is-invalid', !validNum);
+      cardNumEl.classList.toggle('is-valid', validNum);
+      if (!validNum) ok = false;
+ 
+      const expiryEl = document.getElementById('card-expiry');
+      const expiryFb = expiryEl.nextElementSibling;
+      const match = expiryEl.value.trim().match(/^(0[1-9]|1[0-2])\s*\/\s*(\d{2})$/);
+      if (!match) {
+        expiryEl.classList.add('is-invalid'); expiryEl.classList.remove('is-valid');
+        if (expiryFb) { expiryFb.textContent = 'Use MM/YY format.'; expiryFb.style.display = 'block'; }
+        ok = false;
+      } else {
+        const now = new Date();
+        const expired = (2000 + parseInt(match[2])) < now.getFullYear() ||
+          ((2000 + parseInt(match[2])) === now.getFullYear() && parseInt(match[1]) < now.getMonth() + 1);
+        if (expired) {
+          expiryEl.classList.add('is-invalid'); expiryEl.classList.remove('is-valid');
+          if (expiryFb) { expiryFb.textContent = 'Card is expired.'; expiryFb.style.display = 'block'; }
+          ok = false;
+        } else {
+          expiryEl.classList.remove('is-invalid'); expiryEl.classList.add('is-valid');
+          if (expiryFb) expiryFb.style.display = 'none';
+        }
+      }
+      return ok;
+    }
+ 
+    // ─── FORM SUBMIT ──────────────────────────────────────
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      hideError();
+ 
+      const selected = document.querySelector('input[name="pay"]:checked')?.value;
+      if (!selected) { showError("Please select a payment method."); return; }
+ 
+      if (selected === 'card') {
+        if (!cart.length) { showError("Your cart is empty — add items before checking out."); return; }
+        const contactOk = validateContactFields(true);
+        if (!contactOk) {
+          showError("Please fill in all highlighted fields before continuing.");
+          document.querySelector('.form-control.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        const payBtn = document.querySelector('.pay-btn');
+        payBtn.disabled = true;
+        payBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Processing...`;
+
+        const subtotal = cart.reduce((s, i) => s + i.price, 0);
+        const total = subtotal + subtotal * currentTaxRate;
+
+        fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ totalPrice: total })
+        })
+        .then(r => r.json())
+        .then(async data => {
+          if (data.error) throw new Error(data.error);
+          const cardName = document.getElementById('card-name').value.trim();
+          const result = await stripe.confirmCardPayment(data.clientSecret, {
+            payment_method: {
+              card: cardElement,
+              billing_details: { name: cardName }
+            }
+          });
+          if (result.error) {
+            payBtn.disabled = false;
+            payBtn.innerHTML = `Pay $${total.toFixed(2)}`;
+            showError(result.error.message);
+          } else {
+            return placeOrder(total).then(orderId => {
+              clearFormDraft();
+              showOrderConfirmation(orderId);
+            });
+          }
+        })
+        .catch(err => {
+          console.error("Payment error:", err);
+          payBtn.disabled = false;
+          payBtn.innerHTML = `Pay $${total.toFixed(2)}`;
+          showError("Payment failed. Please try again.");
+        });
+        return;
+      }
+ 
+      if (!validateContactFields(false)) {
+        showError("Please enter your name and email before continuing.");
+        document.querySelector('.form-control.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const redirects = {
+        paypal: "https://www.paypal.com/signin",
+        venmo:  "https://account.venmo.com/login",
+        gpay:   "https://pay.google.com/about/",
+      };
+      _allowLeave = true;
+      window.location.href = redirects[selected];
+    }
+ 
+    // ─── ORDER CONFIRMATION ───────────────────────────────
+    function showOrderConfirmation(orderId) {
+      const subtotal = cart.reduce((s, i) => s + i.price, 0);
+      const taxCost  = subtotal * currentTaxRate;
+      const total    = subtotal + taxCost;
+      const snap     = [...cart];
+ 
+      document.getElementById("checkout-layout").style.display = "none";
+      document.getElementById("order-confirmation").style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+ 
+      // SECURITY: escapeHtml on item.name
+      document.getElementById("confirm-items-list").innerHTML = snap.map(i =>
+        `<div class="confirm-row"><span class="text-dark fw-semibold">${escapeHtml(i.name)}</span><span class="text-dark">$${i.price.toFixed(2)}</span></div>`
+      ).join('');
+      document.getElementById("confirm-subtotal").textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById("confirm-tax").textContent      = `$${taxCost.toFixed(2)} (${(currentTaxRate*100).toFixed(2)}%)`;
+      document.getElementById("confirm-total").textContent    = `$${total.toFixed(2)}`;
+      if (orderId) {
+        document.getElementById("confirm-order-id").textContent = `Order #${orderId}`;
+      }
+ 
+      localStorage.setItem("user_cart", JSON.stringify([]));
+      cart = [];
+    }
+ 
+    // ─── FORM PERSISTENCE ─────────────────────────────────
+    const PERSIST_FIELDS = ['cust-name','cust-email','cust-street','cust-zip','cust-city'];
+    const PERSIST_KEY = 'checkout_form_draft';
+ 
+    function saveFormDraft() {
+      const draft = {};
+      PERSIST_FIELDS.forEach(id => { draft[id] = document.getElementById(id)?.value || ''; });
+      localStorage.setItem(PERSIST_KEY, JSON.stringify(draft));
+    }
+    function restoreFormDraft() {
+      try {
+        const draft = JSON.parse(localStorage.getItem(PERSIST_KEY));
+        if (!draft) return;
+        PERSIST_FIELDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && draft[id]) el.value = draft[id];
+        });
+      } catch(e) {}
+    }
+    function clearFormDraft() {
+      localStorage.removeItem(PERSIST_KEY);
+    }
+ 
+    // ─── INIT ─────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      renderNavbarState();
+      renderOrderSummary();
+      restoreFormDraft();
+ 
+      PERSIST_FIELDS.forEach(id => {
+        document.getElementById(id)?.addEventListener('input', saveFormDraft);
+      });
+ 
+      const ccWrapper   = document.getElementById('credit-card-fields-wrapper');
+      const externalNote = document.getElementById('external-payment-note');
+      const payWarning  = document.getElementById('payment-info-warning');
+
+ 
+      function showPayWarning() {
+        payWarning.style.setProperty('display', 'flex', 'important');
+        payWarning.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => payWarning.style.setProperty('display', 'none', 'important'), 4000);
+      }
+ 
+      document.querySelectorAll('.payment-selector-radio').forEach(radio => {
+        radio.addEventListener('change', e => {
+          const isCard = e.target.value === 'card';
+          if (!isCard) {
+            const name  = document.getElementById('cust-name').value.trim();
+            const email = document.getElementById('cust-email').value.trim();
+            if (!name || !email) {
+              document.getElementById('pay-card').checked = true;
+              showPayWarning();
+              if (!name)  document.getElementById('cust-name').classList.add('is-invalid');
+              if (!email) document.getElementById('cust-email').classList.add('is-invalid');
+              return;
+            }
+          }
+          ccWrapper.style.display    = isCard ? 'flex'  : 'none';
+          externalNote.style.display = isCard ? 'none'  : 'block';
+          ccWrapper.querySelectorAll('input').forEach(i => {
+            isCard ? i.setAttribute('required','') : i.removeAttribute('required');
+            i.classList.remove('is-invalid','is-valid');
+          });
+        });
+      });
+ 
+
+      document.querySelectorAll('.form-control').forEach(field => {
+        field.addEventListener('blur', () => {
+          if (!field.value.trim()) return;
+          if (field.id === 'card-expiry' || field.id === 'card-num') {
+            validateCardFields();
+          } else {
+            validateField(field);
+          }
+        });
+      });
+ 
+      const contactFieldIds = ['cust-name','cust-email','cust-street','cust-zip','cust-city'];
+      function hasPartialInput() {
+        const filled  = contactFieldIds.filter(id => document.getElementById(id)?.value.trim());
+        const missing = contactFieldIds.filter(id => !document.getElementById(id)?.value.trim());
+        return filled.length > 0 && missing.length > 0;
+      }
+      function checkoutVisible() {
+        return document.getElementById('checkout-layout').style.display !== 'none';
+      }
+ 
+      document.addEventListener('click', e => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        if (!href || href === '#' || href.startsWith('javascript:')) return;
+        if (!checkoutVisible() || !hasPartialInput()) return;
+        e.preventDefault();
+        const dest = link.href;
+        if (confirm("You have an unfinished checkout. Are you sure you want to leave?")) {
+          _allowLeave = true;
+          window.location.href = dest;
+        }
+      });
+ 
+      window.addEventListener('beforeunload', e => {
+        if (_allowLeave || !checkoutVisible() || !hasPartialInput()) return;
+        e.preventDefault();
+        e.returnValue = '';
+      });
+    });
+  </script>
+</body>
+</html>
