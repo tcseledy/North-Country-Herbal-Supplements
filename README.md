@@ -24,6 +24,8 @@ The server expects `users(id, name, email, password_hash)` (with a unique email)
 ## Setup
 
 ```bash
+git clone https://github.com/tcseledy/North-Country-Herbal-Supplements.git
+cd North-Country-Herbal-Supplements
 npm ci
 cp .env.example .env
 # Fill in .env, then provide server.key and server.crt.
@@ -44,4 +46,19 @@ See `.env.example`. Never use the example values in production or commit `.env`,
 npm test
 ```
 
+This command checks the JavaScript syntax of `server.js`; it does not run database, browser, or payment integration tests.
+
 Before deployment, use Stripe test mode to exercise successful, declined, and interrupted payments and verify your MySQL schema and least-privilege grants.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `home.html` | Storefront landing page |
+| `index.html` | Product catalog, cart, and checkout |
+| `login.html`, `signup.html` | Account forms |
+| `styles.css` | Shared page styles |
+| `server.js` | HTTP/HTTPS server, authentication, tax, and payment APIs |
+| `TAXRATES_ZIP5_*.csv` | ZIP-based tax datasets used by the server |
+| `.env.example` | Configuration template with placeholder values |
+| `package.json`, `package-lock.json` | Node.js commands and dependencies |
