@@ -1,14 +1,18 @@
 {
-  "name": "securecheckout",
+  "name": "north-country-herbal-supplements",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Security-hardened herbal supplement storefront and Stripe checkout",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "check": "node --check server.js",
+    "test": "npm run check"
   },
-  "keywords": [],
+  "keywords": ["storefront", "stripe", "security"],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": { "node": ">=20" },
   "type": "commonjs",
   "dependencies": {
     "argon2": "^0.44.0",
