@@ -14,3 +14,7 @@ npm-debug.log*
 
 # Logs
 *.log
+
+# Legacy/sensitive files
+users.json
+*.tar.gz
