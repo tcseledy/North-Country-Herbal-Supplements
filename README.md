@@ -21,7 +21,7 @@ North Country Herbal Supplements is a full-stack e-commerce web application buil
 - JavaScript
 - Node.js
 - MySQL
-- `mysql2`
+- mysql2
 - Argon2
 - Stripe API
 - Cookies
