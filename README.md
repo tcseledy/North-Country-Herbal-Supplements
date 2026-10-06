@@ -13,6 +13,7 @@ North Country Herbal Supplements is a full-stack e-commerce web application buil
 - Cookie-based session functionality
 - Responsive web interface
 - Security-focused checkout design
+- Password validation requiring at least 12 characters, including an uppercase letter, lowercase letter, number, and special   character
 
 ## Technologies Used
 
