@@ -497,13 +497,13 @@
         document.getElementById('cust-state').removeAttribute('readonly');
         if (addrData.city)  document.getElementById('cust-city').value  = addrData.city;
         if (addrData.state) document.getElementById('cust-state').value = addrData.state;
-        if (addrData.zip)   document.getElementById('cust-zip').value   = addrData.zip;
 
         // Step 2: Tax lookup using verified ZIP
         const taxRes = await fetch('/api/calculate-tax', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: addrData.zip, zipCode: addrData.zip })
+          // Use the customer's original ZIP for tax calculation.
+          body: JSON.stringify({ address: zip, zipCode: zip })
         });
         const taxData = await taxRes.json();
 

@@ -1009,6 +1009,16 @@ const server = https.createServer( options,
 
                             const addr = results[0] .address;
 
+                            // Reject addresses that do not match the entered ZIP code.
+                            const returnedZip = String(addr.postcode || '').slice(0, 5);
+
+                            if (returnedZip !== String(zip).slice(0, 5)) {
+                               return json(res, 400, {
+                                success: false,
+                                error: 'The address does not match the entered ZIP code.'
+                              });
+                            }
+
                             res.writeHead( 200,
                               {
                                 'Content-Type': 'application/json'
@@ -1098,24 +1108,28 @@ const server = https.createServer( options,
                     censusRes.on( 'end',
                       () => {
                         try {
-                          const result = JSON.parse( data );
+                          const result = JSON.parse(data);
+                          const matches = result?.result?.addressMatches;
 
-                          const matches = result ?.result ?.addressMatches;
-
-                          if ( !matches || matches.length === 0
-                          ) {
+                          // Try the fallback service if Census cannot find the address.
+                          if (!matches || matches.length === 0) {
                             return tryNominatim();
                           }
 
                           const match = matches[0];
+                          const components = match.addressComponents;
 
-                          const components = match .addressComponents;
+                          // SECURITY: Reject addresses that do not match the customer's ZIP code.
+                          if (String(components.zip).slice(0, 5) !== String(zip).slice(0, 5)) {
+                            return json(res, 400, {
+                              success: false,
+                              error: 'The street address does not match the entered ZIP code.'
+                            });
+                          }
 
-                          res.writeHead( 200,
-                            {
-                              'Content-Type': 'application/json'
-                            }
-                          );
+                          res.writeHead(200, {
+                              'Content-Type': 'application/json'  
+                          });
 
                           res.end( JSON.stringify(
                               {

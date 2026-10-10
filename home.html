@@ -1,124 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Sets character encoding and responsive viewport -->
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home - North Country's Herbal Supplements</title>
- 
-  <!-- SECURITY: Content Security Policy -->
+  <!-- SECURITY: Restricts where scripts, styles, images, and network requests can originate -->
+  <!-- Note: frame-ancestors must be set as an HTTP header; unsafe-inline weakens CSP -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self';
              script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
              style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
              img-src 'self' data:;
-             connect-src 'self';
-             frame-ancestors 'none';">
- 
+             connect-src 'self';">
+  <!-- Loads Bootstrap styling and the website's custom CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
- 
+  <!-- Navigation bar containing the store logo and account controls -->
   <nav class="site-nav">
     <div class="storefront-container d-flex justify-content-between align-items-center w-100 py-0">
       <a href="home.html" class="logo-link">North Country's Herbal Supplements</a>
-      <div id="navbar-controls" class="d-flex align-items-center gap-2">
-        </div>
+      <!-- JavaScript populates this section depending on the user's login status -->
+      <div id="navbar-controls" class="d-flex align-items-center gap-2"></div>
     </div>
   </nav>
- 
+
   <main>
     <div class="storefront-container pt-0">
+      <!-- Product grid uses styles.css to arrange product cards -->
       <div class="product-grid">
- 
+        <!-- Product 1: Clicking the card opens its modal; clicking the button adds it to the cart -->
         <div class="product-card" onclick="openProductModal(event, 'Organic Ashwagandha')">
-          <div class="product-icon">🌿</div>
+          <div class="product-icon">🌱</div>
           <h3>Organic Ashwagandha</h3>
-          <div class="price">$1.00</div>
-          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Organic Ashwagandha', 1.00)">Add to Cart</button>
+          <div class="price">$9.99</div>
+          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Organic Ashwagandha', 9.99)">Add to Cart</button>
         </div>
- 
+        <!-- Product 2: Lion's Mane Extract -->
         <div class="product-card" onclick="openProductModal(event, 'Lion\'s Mane Extract')">
           <div class="product-icon">🍄</div>
           <h3>Lion's Mane Extract</h3>
-          <div class="price">$1.00</div>
-          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Lion\'s Mane Extract', 1.00)">Add to Cart</button>
+          <div class="price">$12.50</div>
+          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Lion\'s Mane Extract', 12.50)">Add to Cart</button>
         </div>
- 
+        <!-- Product 3: Herbal Sleep Tea Blend -->
         <div class="product-card" onclick="openProductModal(event, 'Herbal Sleep Tea Blend')">
           <div class="product-icon">🍵</div>
           <h3>Herbal Sleep Tea Blend</h3>
-          <div class="price">$1.00</div>
-          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Herbal Sleep Tea Blend', 1.00)">Add to Cart</button>
+          <div class="price">$14.99</div>
+          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Herbal Sleep Tea Blend', 14.99)">Add to Cart</button>
         </div>
- 
+        <!-- Product 4: Raw Local Propolis -->
         <div class="product-card" onclick="openProductModal(event, 'Raw Local Propolis')">
           <div class="product-icon">🐝</div>
           <h3>Raw Local Propolis</h3>
-          <div class="price">$1.00</div>
-          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Raw Local Propolis', 1.00)">Add to Cart</button>
+          <div class="price">$9.99</div>
+          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Raw Local Propolis', 9.99)">Add to Cart</button>
         </div>
- 
+        <!-- Product 5: Raw Wildflower Honey -->
+        <div class="product-card" onclick="openProductModal(event, 'Raw Wildflower Honey')">
+          <div class="product-icon">🍯</div>
+          <h3>Raw Wildflower Honey</h3>
+          <div class="price">$14.99</div>
+          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Raw Wildflower Honey', 14.99)">Add to Cart</button>
+        </div>
+        <!-- Product 6: Organic Bee Pollen -->
+        <div class="product-card" onclick="openProductModal(event, 'Organic Bee Pollen')">
+          <div class="product-icon">🌼</div>
+          <h3>Organic Bee Pollen</h3>
+          <div class="price">$19.99</div>
+          <button class="add-to-cart-btn" onclick="handleInlineAddToCart(event, 'Organic Bee Pollen', 19.99)">Add to Cart</button>
+        </div>
       </div>
     </div>
- 
-    <div id="product-modal" class="modal fade" window-filter="disabled" tabindex="-1" aria-hidden="true">
+
+    <!-- Bootstrap modal displays additional information about a selected product -->
+    <div id="product-modal" class="modal fade" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4 border-0 rounded-4 shadow-lg">
+          <!-- Closes the modal without adding anything to the cart -->
           <div class="d-flex justify-content-end">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <!-- JavaScript updates these elements with the selected product's details -->
           <div id="modal-icon" class="display-3 my-2">🌿</div>
           <h2 id="modal-title" class="text-dark fw-bold h4 mb-2">Product Title</h2>
           <p id="modal-price" class="fw-bold fs-5 my-2" style="color: #6c63ff;">$0.00</p>
           <p id="modal-description" class="text-muted small lh-base my-3">Product description goes here.</p>
+          <!-- JavaScript generates the modal's Add to Cart button inside this container -->
           <div id="modal-action-container"></div>
         </div>
       </div>
     </div>
   </main>
- 
+
+  <!-- Website footer -->
   <footer>
     © 2026 Theo Cseledy - North Country's Herbal Supplements
   </footer>
- 
+
+  <!-- Bootstrap JavaScript provides the modal functionality -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
- 
   <script>
-    // SECURITY: Escape all user-controlled strings before inserting into innerHTML
+    // SECURITY: Converts special HTML characters into safe entities before inserting text into innerHTML.
+    // This helps prevent HTML injection when displaying user-controlled information.
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
     }
- 
+
+    // Creates an empty shopping cart in localStorage if one does not already exist.
+    // localStorage preserves the cart when the user refreshes or navigates between pages.
     if (!localStorage.getItem('user_cart')) {
       localStorage.setItem('user_cart', JSON.stringify([]));
     }
- 
+
+    // Stores product information in one catalog so the modal and shopping cart use consistent data.
+    // Each product contains an icon, price, and description, indexed by its product name.
     const PRODUCT_DETAILS = {
-      "Organic Ashwagandha": { icon: "🌱", price: 1.00, desc: "A powerful adaptogenic herb sourced natively to help your body manage stress, stabilize mood, balance cortisol parameters, and enhance absolute daily stamina levels naturally." },
-      "Lion's Mane Extract": { icon: "🍄", price: 1.00, desc: "Premium wood-grown fungal extract formula designed specifically to maximize cognitive neurological performance, support brain cell regeneration, and clear chronic mental fog." },
-      "Herbal Sleep Tea Blend": { icon: "🍵", price: 1.00, desc: "A calming, caffeine-free infusion of organic chamomile, valerian root, and lavender fields formulated to transition your mind smoothly into deep, restorative REM sleep cycles." },
-      "Raw Local Propolis": { icon: "🐝", price: 1.00, desc: "Pure resinous hive extraction packed full of natural antioxidant flavonoids to fortify immune defense mechanisms and accelerate biological recovery speeds." }
+      "Organic Ashwagandha": { icon: "🌱", price: 9.99, desc: "A powerful adaptogenic herb sourced natively to help your body manage stress, stabilize mood, balance cortisol parameters, and enhance absolute daily stamina levels naturally." },
+      "Lion's Mane Extract": { icon: "🍄", price: 12.50, desc: "Premium wood-grown fungal extract formula designed specifically to maximize cognitive neurological performance, support brain cell regeneration, and clear chronic mental fog." },
+      "Herbal Sleep Tea Blend": { icon: "🍵", price: 14.99, desc: "A calming, caffeine-free infusion of organic chamomile, valerian root, and lavender fields formulated to transition your mind smoothly into deep, restorative REM sleep cycles." },
+      "Raw Local Propolis": { icon: "🐝", price: 9.99, desc: "Pure resinous hive extraction packed full of natural antioxidant flavonoids to fortify immune defense mechanisms and accelerate biological recovery speeds." },
+      "Raw Wildflower Honey": { icon: "🍯", price: 14.99, desc: "Premium unfiltered wildflower honey harvested from natural beehives, rich in naturally occurring antioxidants and floral nutrients." },
+      "Organic Bee Pollen": { icon: "🌼", price: 19.99, desc: "Naturally harvested bee pollen granules containing plant proteins, essential amino acids, vitamins, and minerals to support everyday nutritional wellness." }
     };
- 
+
+    // Stores the Bootstrap modal instance so other functions can open and close it.
+    // It is initialized after the HTML document has finished loading.
     let bootstrapModalInstance = null;
- 
+
+    // Updates the navigation bar depending on whether the user is logged in.
+    // The active_user object is read from localStorage and used to display account controls.
     function syncNavbarState() {
       const navContainer = document.getElementById("navbar-controls");
       if (!navContainer) return;
- 
-      const loggedUser = JSON.parse(localStorage.getItem("active_user"));
- 
+
+      // Reads the stored user information; invalid JSON is treated as a logged-out state.
+      let loggedUser = null;
+      try {
+        loggedUser = JSON.parse(localStorage.getItem("active_user"));
+      } catch (e) {
+        loggedUser = null;
+      }
+
       if (loggedUser) {
-        // SECURITY: escapeHtml on loggedUser.name
+        // SECURITY: Escapes the user's name before inserting it into the navigation HTML.
+        // Logged-in users can access checkout or log out of their account.
         navContainer.innerHTML = `
           <span class="user-greeting">Hi, ${escapeHtml(loggedUser.name)}</span>
           <a href="index.html" class="login">Checkout</a>
           <a href="#" class="login" onclick="logoutUser(); return false;">Log-out</a>
         `;
       } else {
+        // Logged-out users are given links to checkout, log in, or create an account.
         navContainer.innerHTML = `
           <a href="index.html" class="login">Checkout</a>
           <a href="login.html" class="login">Log-in</a>
@@ -126,62 +164,84 @@
         `;
       }
     }
- 
+
+    // Logs the user out by removing their locally stored account information.
+    // Reloading the page causes the navigation bar to display the logged-out links.
+    // A real authentication system must also invalidate the session on the server.
     function logoutUser() {
       localStorage.removeItem("active_user");
       window.location.reload();
     }
- 
+
+    // Adds a selected product to the shopping cart stored in localStorage.
+    // itemName identifies the product; itemPrice is retained for compatibility with the buttons.
     function addToCart(itemName, itemPrice) {
-      // SECURITY: validate against trusted catalog — ignore unknown products
+      // SECURITY: Rejects product names that are not present in the product catalog.
       const product = PRODUCT_DETAILS[itemName];
       if (!product) return;
- 
+
+      // Reads the existing cart and resets it if the stored data is invalid.
       let currentCart = [];
       try {
         currentCart = JSON.parse(localStorage.getItem('user_cart')) || [];
+        if (!Array.isArray(currentCart)) currentCart = [];
       } catch (e) {
         currentCart = [];
       }
-      // SECURITY: use catalog price, not the price passed in from the DOM
+
+      // SECURITY: Uses the catalog price instead of trusting the price passed by the HTML button.
+      // A production checkout server must independently validate the product and price.
       currentCart.push({ name: itemName, price: product.price });
+
+      // Saves the updated cart as JSON and confirms the addition to the user.
       localStorage.setItem('user_cart', JSON.stringify(currentCart));
       alert(`Added ${itemName} to your cart!`);
     }
- 
+
+    // Handles Add to Cart clicks directly from the storefront product cards.
+    // stopPropagation() prevents the card's click handler from opening the product modal.
     function handleInlineAddToCart(e, itemName, itemPrice) {
       e.stopPropagation();
       addToCart(itemName, itemPrice);
     }
- 
+
+    // Opens the product modal and fills it with information from PRODUCT_DETAILS.
+    // The productName parameter identifies which product the user selected.
     function openProductModal(e, productName) {
       e.stopPropagation();
+
+      // Retrieves the product and stops if the product name is not recognized.
       const item = PRODUCT_DETAILS[productName];
       if (!item) return;
- 
-      // SECURITY: product data is from a trusted const — but use textContent to be safe
-      document.getElementById("modal-icon").textContent        = item.icon;
-      document.getElementById("modal-title").textContent       = productName;
-      document.getElementById("modal-price").textContent       = `$${item.price.toFixed(2)}`;
+
+      // SECURITY: textContent inserts product information as text rather than executable HTML.
+      // toFixed(2) formats prices consistently with two decimal places.
+      document.getElementById("modal-icon").textContent = item.icon;
+      document.getElementById("modal-title").textContent = productName;
+      document.getElementById("modal-price").textContent = `$${item.price.toFixed(2)}`;
       document.getElementById("modal-description").textContent = item.desc;
- 
+
+      // Creates an Add to Cart button for the selected product inside the modal.
       const actionContainer = document.getElementById("modal-action-container");
       actionContainer.innerHTML = `<button class="pay-btn" id="modal-submit-btn">Add to Cart - $${item.price.toFixed(2)}</button>`;
- 
+
+      // Connects the modal button to the cart function and closes the modal afterward.
       document.getElementById("modal-submit-btn").onclick = function(btnEvent) {
         btnEvent.stopPropagation();
         addToCart(productName, item.price);
         if (bootstrapModalInstance) bootstrapModalInstance.hide();
       };
- 
+
+      // Displays the Bootstrap modal once its contents have been updated.
       if (bootstrapModalInstance) {
         bootstrapModalInstance.show();
       }
     }
- 
+
+    // Runs after the HTML document has been parsed so all required elements exist.
+    // Initializes the navigation bar and creates the Bootstrap modal instance.
     document.addEventListener("DOMContentLoaded", () => {
       syncNavbarState();
- 
       const modalEl = document.getElementById("product-modal");
       if (modalEl) {
         bootstrapModalInstance = new bootstrap.Modal(modalEl);
